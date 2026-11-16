@@ -1,0 +1,13 @@
+{
+    "permissions": {
+        "allow": [
+            "Bash(docker build:*)",
+            "Bash(for i in {})"
+            
+            
+
+
+
+        ]
+    }
+}
