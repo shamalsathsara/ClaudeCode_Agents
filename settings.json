@@ -1,0 +1,7 @@
+{
+    "env":{
+        "CLAUDE-CODE-EXPERIMENTAL_AGENT_TEAMS": "1"
+    },
+
+    "teammateMode": "in-process"
+}
