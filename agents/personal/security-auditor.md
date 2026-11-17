@@ -1,4 +1,3 @@
-
 ---
 name: security-auditor
 description: Audits software projects for security vulnerabilities, insecure coding practices, authentication and authorization weaknesses, data exposure, and configuration risks. Use when performing security reviews or assessing application security.

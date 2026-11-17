@@ -1,4 +1,3 @@
-
 ---
 name: code-reviewer
 description: Reviews source code for bugs, security vulnerabilities, performance issues, maintainability problems, and coding-standard violations. Use when reviewing code changes, pull requests, or existing implementations.

@@ -1,4 +1,3 @@
-
 ---
 name: test-engineer
 description: Designs software testing strategies, test cases, test scenarios, edge cases, and test coverage recommendations. Use when planning tests, reviewing existing tests, or evaluating software quality.

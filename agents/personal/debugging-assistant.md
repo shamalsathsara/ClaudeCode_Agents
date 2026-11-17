@@ -1,4 +1,3 @@
-
 ---
 name: debugging-assistant
 description: Investigates software bugs, analyzes error messages, traces execution flows, identifies root causes, and recommends reliable fixes. Use when debugging errors, unexpected behavior, or application failures.

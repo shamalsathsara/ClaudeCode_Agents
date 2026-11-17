@@ -1,4 +1,3 @@
-
 ---
 name: documentation-writer
 description: Creates, improves, and maintains clear technical documentation, including README files, API documentation, architecture guides, setup instructions, and developer guides. Use when technical documentation needs to be written or updated.
