@@ -336,6 +336,42 @@ A `Read` deny rule blocks Claude's **file tools** from reading a path. The docs 
 
 Bare names match at any depth, so `Read(.env)` and `Read(**/.env)` are equivalent. A path such as `/Users/alice/file` is not absolute. Use `//Users/alice/file`.
 
+### Negation (`!`) carve-outs and this project's `.env` rules
+
+**Documented** (permissions page, as relayed by a documentation check during Phase 7):
+
+- A `deny` or `ask` pattern that starts with `!` is a gitignore negation. It carves the paths it matches out of the `path` or `./path` rules listed before it, in the same settings file. A `!` rule listed first carves nothing out.
+- The carve-out reaches only rules from the same source. It cannot cancel a deny from user, managed or other settings files.
+- An `allow` rule cannot carve an exception out of a `deny` rule. Deny is checked first.
+- `*` matches within a single path segment, so `.env.*` matches `.env.example`. It does not match a file named exactly `.env`.
+
+This project's `.claude/settings.json` deny list contains these three rules, in this order:
+
+```json
+"Read(.env)",
+"Read(.env.*)",
+"Read(!.env.example)"
+```
+
+**Interpretation of those rules:**
+
+| File | Result |
+|---|---|
+| `.env` | Blocked by `Read(.env)` |
+| `.env.local`, `.env.production` | Blocked by `Read(.env.*)` |
+| `.env.example` | Matched by `.env.*`, then carved out by `!.env.example`, so no deny rule applies |
+| `.env.example.bak` | Blocked, because `!.env.example` does not match it |
+
+Notes:
+
+- The `!` rule must stay after `.env.*` and in the same file. Moving it earlier or to another settings file removes the carve-out.
+- "No deny rule applies" is not an explicit allow. The file is then handled by the normal read behavior.
+- These rules cover Claude's file tools and the file commands the docs say Claude Code recognizes in Bash. They do not cover a script that opens files itself. The conservative advice in the "How Bash rules and Read rules differ" section above still applies to indirect reads. Use the sandbox for hard guarantees.
+
+**Version-specific verification limitation:** the documentation gives no minimum version for `!` negation and does not mention Claude Code 2.1.326, the version installed during Phase 7. The interpretation above comes from the documentation. It has not been verified at runtime on 2.1.326. A successful read of `.env.example` is consistent with the carve-out but does not prove which rule matched, so it is not counted as a test. A runtime check would need a dummy `.env` and `.env.example` in a disposable project with a fresh session, and it has not been done. User-level and managed settings were not inspected, and a deny there would not be reopened by this carve-out.
+
+**`.env.example` is a permission-testing fixture, not an environment template.** It contains only `TEST_VALUE=example`. Its purpose is to exercise the `.gitignore` exception (`!.env.example`) and the `Read(!.env.example)` carve-out above. The project has no runtime environment variables, so the file does not describe any, and it should not be copied as a starting point for real configuration. Never put real secrets in it.
+
 ### Web rules
 
 `WebFetch(domain:example.com)` matches only that host. `WebFetch(domain:*.example.com)` matches subdomains but not `example.com` itself.
@@ -400,7 +436,30 @@ What each part does:
 - **Exit code 2 blocks the action.** The hook's standard error text is shown to Claude as the reason.
 - Exit code 1 and other non-zero codes are non-blocking errors and the action goes ahead. If your hook enforces a policy, use exit code 2.
 - Exit code 0 from a `PreToolUse` hook does not approve the action. The call still goes through the normal permission flow.
-- A timed-out hook does not block by default.
+- A timed-out hook does not block by default. With `onFailure: "block"`, a hook that fails to start, exits with an error other than 2, prints invalid JSON or times out blocks the action. Only the failure-to-start case was tested live (Claude Code 2.1.326, headless mode); crash and timeout behavior is documented but was not independently tested. Check the [hooks reference](https://code.claude.com/docs/en/hooks) for the exact wording, because this guide relied on a summary of it.
+- `onFailure: "block"` needs Claude Code v2.1.295 or later. On older versions the field is not documented, so do not assume it is enforced. The version installed for the Phase 7 checks was 2.1.326.
+
+### Failure policy of the agent allowlist hook
+
+The `agent-allowlist.js` hook deliberately mixes fail-open and fail-closed behavior. This policy was approved in Phase 7.
+
+| Situation | Result | Why |
+|---|---|---|
+| Valid call from the main session or any caller other than `agent-orchestrator` | Allowed (exit 0) | The main session must never be blocked |
+| `agent-orchestrator` requests an allowlisted agent | Allowed (exit 0) | Intended use |
+| `agent-orchestrator` requests any other agent, or sets no `subagent_type` | Blocked (exit 2) | The purpose of the hook |
+| Malformed JSON, empty input, non-object input, internal error | Allowed (exit 0, fail-open) | The caller cannot be identified, and blocking would also block the main session |
+| Hook cannot start (for example the executable is missing) | Blocked by `onFailure: "block"` | Configured in `.claude/settings.json`. Tested live in Phase 7 (Claude Code 2.1.326, headless mode). |
+| Hook crashes after starting, exits with a non-2 error, or times out | Documented to be blocked by `onFailure: "block"` | Not independently tested |
+
+Security trade-off of the fail-open rows:
+
+- The hook identifies the orchestrator only through the `agent_type` field in its input. If that field is missing, renamed or unreadable, the restriction is silently not applied.
+- Concretely, a payload with a leading UTF-8 byte order mark fails to parse, so the hook allows it. The automated test script records this.
+- The docs describe `agent_type` as present when a hook fires inside a subagent, but give no version in which it was introduced. A Claude Code upgrade could change this without any error.
+- No `timeout` is set in the hook entry, so the documented default (600 seconds) applies.
+
+Required canary: after every Claude Code upgrade, run the live check in which `agent-orchestrator` attempts to delegate to `general-purpose` and confirm the message `Blocked by agent-allowlist` appears. The steps are Test 02 in `docs/DOCKER_SANDBOX_END_TO_END_GUIDE.md`.
 
 ### A simple example: block force pushes
 

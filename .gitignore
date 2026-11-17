@@ -1,0 +1,28 @@
+# Environment files (keep example files trackable)
+.env
+.env.*
+!.env.example
+!*.env.example
+
+# Local Claude Code settings (personal, not shared)
+settings.local.json
+.claude/settings.local.json
+
+# Dependencies and generated output
+node_modules/
+dist/
+build/
+coverage/
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+
+# OS-generated files
+Thumbs.db
+.DS_Store
+
+# Editor files
+# .vscode/ is intentionally NOT ignored: shared workspace config
+# (settings, tasks, launch, extensions) may be added to this repo.

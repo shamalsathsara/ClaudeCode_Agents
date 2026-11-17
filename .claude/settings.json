@@ -33,6 +33,17 @@
       "Bash(npx *)",
       "Bash(rm *)",
       "Bash(Remove-Item*)"
+    ],
+    "deny": [
+      "Read(.env)",
+      "Read(.env.*)",
+      "Read(!.env.example)",
+      "Read(**/.credentials.json)",
+      "Read(**/secrets/**)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)",
+      "Edit(.claude/**)",
+      "Edit(settings*.json)"
     ]
   },
   "hooks": {

@@ -537,13 +537,22 @@ Also record:
 
 The following items were not fully tested during our original testing session:
 
-1. All ten approved agents were not individually tested through live sandbox delegation.
+1. All ten approved agents were not individually tested through live sandbox delegation. Only `skill-builder` was delegated to live in the sandbox. The other nine were checked inside the sandbox only at hook level (see the note below).
 2. The `bypassPermissions` scenario was not tested.
-3. Fail-open behavior was tested synthetically on the host, not through live sandbox tests.
+3. Fail-open behavior was tested synthetically on the host and at hook level inside the sandbox (malformed and empty input), but not through a live Claude Code session in the sandbox.
 4. Agent availability differed between the host and sandbox environments.
 5. Node.js is required for the JavaScript hook to execute.
 
-The `onFailure: "block"` setting means hook process startup failures can prevent Agent calls.
+**Two validation levels are different and must not be mixed up:**
+
+- **Hook-level sandbox validation:** the hook process is run inside the sandbox with `sbx exec` and synthetic JSON on stdin, and only its exit code and message are checked. No Claude Code agent is started. This covered all ten approved agents, the block cases and fail-open for malformed and empty input.
+- **Live Claude Code delegation:** a real Claude Code session makes a real Agent tool call and the hook is invoked by the harness. In the sandbox this covered only the tests in section 13.
+
+The `onFailure: "block"` setting (Claude Code v2.1.295 or later) is documented to block the Agent call when the hook fails to start, crashes or times out. Only the failure-to-start case was tested live: on the host, with Claude Code 2.1.326 in headless `claude -p` mode, a hook with a nonexistent executable blocked the Agent call, and an identical `onFailure: "continue"` control did not. Crash and timeout behavior is documented but was not independently tested, and none of this was tested inside the sandbox. See `tests/DOCKER_SANDBOX_SECURITY_TEST_REPORT.md`, section 6C.
+
+The hook is deliberately fail-open for malformed input, internal errors and callers other than `agent-orchestrator`. See section 8 of `docs/PROJECT_SETTINGS_JSON_SETUP_GUIDE.md` for the approved policy and its security trade-off.
+
+**Required canary:** Test 02 (orchestrator to `general-purpose`) is a mandatory check after every Claude Code upgrade. The hook relies on the `agent_type` field, and a change to that field would disable the restriction silently. If Test 02 does not show `Blocked by agent-allowlist`, treat the allowlist as not working.
 
 These limitations should be considered when interpreting the test results.
 
