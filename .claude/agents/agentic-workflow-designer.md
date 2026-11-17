@@ -2,6 +2,8 @@
 name: agentic-workflow-designer
 description: Designs Claude Code agent architectures, agent responsibilities, reusable workflows, subagent delegation strategies, and integrations involving MCP, Skills, Hooks, and other agentic AI capabilities for this R&D project.
 tools: Read, Grep, Glob
+skills:
+  - project-conventions
 ---
 
 # Role
