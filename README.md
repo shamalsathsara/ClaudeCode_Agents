@@ -328,7 +328,7 @@ The workflow may be adapted depending on project complexity, available agents, a
 | 04 | Project-specific Agents | Planned |
 | 05 | Project documentation templates | Planned |
 | 06 | Subagents and task delegation | Planned |
-| 07 | MCP server integrations | Planned |
+| 07 | MCP server integrations | PASS WITH LIMITATIONS: Atlassian MCP connects and its 26 tools are discovered, but Trello access is unverified (Rovo Search returned HTTP 502). See [docs/MCP_SETUP_GUIDE.md](docs/MCP_SETUP_GUIDE.md) |
 | 08 | Skills, Hooks, Plugins and Settings | Planned |
 | 09 | Permissions and Sandbox evaluation | Planned |
 | 10 | Native Agent Teams | Planned |
