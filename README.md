@@ -224,6 +224,8 @@ The Team Lead will:
 
 Teammates will perform their assigned tasks independently where possible and communicate through supported team coordination mechanisms.
 
+**Status:** this workflow has been validated in a supervised team session and in one full-stack Greeting application run, with documented limitations. See [tests/AGENT_TEAMS_VALIDATION_REPORT.md](tests/AGENT_TEAMS_VALIDATION_REPORT.md).
+
 We will study native Claude Code Agent Teams before exploring external orchestration systems.
 
 ## 7. MCP, Skills, Hooks, and Integrations
@@ -322,22 +324,24 @@ The workflow may be adapted depending on project complexity, available agents, a
 
 | Phase | Focus | Status |
 |---|---|---|
-| 01 | Repository and documentation structure | Planned |
-| 02 | Personal Claude Code configuration | Planned |
-| 03 | First Personal Agents | Planned |
-| 04 | Project-specific Agents | Planned |
-| 05 | Project documentation templates | Planned |
-| 06 | Subagents and task delegation | Planned |
+| 01 | Repository and documentation structure | Partially complete: `docs/`, `agents/`, `templates/`, `examples/` and `tests/` exist. Several guides listed in section 12 do not exist under those names, and `configurations/` is empty |
+| 02 | Personal Claude Code configuration | Partially complete: personal agents are installed and documented in [docs/PERSONAL_AGENTS_SETUP_GUIDE.md](docs/PERSONAL_AGENTS_SETUP_GUIDE.md). There is no separate guide for other personal settings |
+| 03 | First Personal Agents | Completed: 6 read-only personal agents plus 5 implementation agents, kept as reference copies in `agents/personal/` |
+| 04 | Project-specific Agents | Completed: 5 project agents in `.claude/agents/` |
+| 05 | Project documentation templates | Completed: 6 templates in `templates/project-documentation/` |
+| 06 | Subagents and task delegation | Completed with limitations: the allowlist hook is tested at hook level and live. See [tests/DOCKER_SANDBOX_SECURITY_TEST_REPORT.md](tests/DOCKER_SANDBOX_SECURITY_TEST_REPORT.md) section 7 for what is not tested |
 | 07 | MCP server integrations | PASS WITH LIMITATIONS: Atlassian MCP connects and its 26 tools are discovered, but Trello access is unverified (Rovo Search returned HTTP 502). See [docs/MCP_SETUP_GUIDE.md](docs/MCP_SETUP_GUIDE.md) |
-| 08 | Skills, Hooks, Plugins and Settings | Planned |
-| 09 | Permissions and Sandbox evaluation | Planned |
-| 10 | Native Agent Teams | Planned |
+| 08 | Skills, Hooks, Plugins and Settings | Partially complete: one project skill, one `PreToolUse` hook and project permission rules exist ([docs/PROJECT_SETTINGS_JSON_SETUP_GUIDE.md](docs/PROJECT_SETTINGS_JSON_SETUP_GUIDE.md)). Plugins have not been evaluated |
+| 09 | Permissions and Sandbox evaluation | Partially complete: Docker Sandbox allowlist tests passed, but permission-bypass behaviour, live delegation to the other approved agents and some hook failure modes are not tested. See [tests/DOCKER_SANDBOX_SECURITY_TEST_REPORT.md](tests/DOCKER_SANDBOX_SECURITY_TEST_REPORT.md) section 7 |
+| 10 | Native Agent Teams | Completed with limitations: validated in a supervised team session and a Greeting application run (17/17 backend, 14/14 frontend, 18/18 headless Chrome checks). File ownership is not technically enforced and screen readers and other browsers were not tested. See [tests/AGENT_TEAMS_VALIDATION_REPORT.md](tests/AGENT_TEAMS_VALIDATION_REPORT.md) |
 | 11 | GSD workflow exploration | Planned |
 | 12 | Gas Town exploration | Planned |
 | 13 | Integration and sample project testing | Planned |
 | 14 | Developer setup guides and examples | Planned |
 
-Statuses will be updated as each phase is implemented and verified.
+Statuses are updated as each phase is implemented and verified. "Completed with limitations" means the validation passed and the remaining gaps are listed in the linked report. Phases 11 and 12 (GSD and Gas Town) have not started, and phases 13 and 14 remain open.
+
+Note on numbering: the Agent Teams validation work was referred to as "Phase 9" during the project, but Agent Teams is row 10 here. Row 09 is the separate Permissions and Sandbox evaluation and is not marked completed. The numbers were not changed.
 
 ## 12. Repository Documentation Structure
 
